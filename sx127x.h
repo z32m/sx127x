@@ -59,6 +59,7 @@ typedef struct
 } sx127x_config_t;
 
 DEFINE_BITS(sx127x_reg_opmode);
+DEFINE_BITS(sx127x_reg_irqflags);
 
 int sx127x_read_reg(const spi_t *spi, uint8_t reg, uint8_t *val);
 int sx127x_write_reg(const spi_t *spi, uint8_t reg, uint8_t val);
