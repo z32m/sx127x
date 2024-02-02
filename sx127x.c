@@ -26,7 +26,8 @@ BITS_GROUP(opmode_state, 0, 2,
            DESC(0b011, "TX"),
            DESC(0b010, "FSTX"),
            DESC(0b100, "FSRX"),
-           DESC(0b101, "RX"));
+           DESC(0b101, "RXCONT"),
+           DESC(0b110, "RXSING"));
 
 BITS_VALUE(sx127x_reg_opmode, opmode_mode, opmode_modulation_type, opmode_freq, opmode_state);
 
@@ -111,64 +112,16 @@ int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config)
 
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_SF_MASK, config->data_rate);
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_RXPAYLOADCRC_MASK, RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON);
+
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK, RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB);
+    fallback(1, sx127x_write_reg, spi, REG_LR_SYMBTIMEOUTLSB, RFLR_SYMBTIMEOUTLSB_SYMBTIMEOUT);
 
     fallback(1, sx127x_write_reg, spi, REG_LR_PREAMBLEMSB, (uint8_t)((config->preamble_len >> 8) & 0xFF));
     fallback(1, sx127x_write_reg, spi, REG_LR_PREAMBLELSB, (uint8_t)(config->preamble_len & 0xFF));
     fallback(1, sx127x_set_freq, spi, config->freq);
 
-    fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG3, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON);
+    // fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG3, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON);
     fallback(1, sx127x_write_reg, spi, REG_LR_PAYLOADLENGTH, config->packet_len);
-
-    // fallback(1, sx127x_write_reg, spi, REG_LR_IRQFLAGSMASK, RFLR_IRQFLAGS_RXTIMEOUT_MASK | RFLR_IRQFLAGS_RXDONE_MASK | RFLR_IRQFLAGS_TXDONE_MASK);
-
-    /*
-
-    RegFifoTxBaseAddr
-
-    */
-
-    // SX1276Write(REG_LR_SYMBTIMEOUTLSB, (uint8_t)(symbTimeout & 0xFF));
-
-    // if (fixLen == 1)
-    // {
-    //     SX1276Write(REG_LR_PAYLOADLENGTH, payloadLen);
-    // }
-
-    // if (SX1276.Settings.LoRa.FreqHopOn == true)
-    // {
-    //     SX1276Write(REG_LR_PLLHOP, (SX1276Read(REG_LR_PLLHOP) & RFLR_PLLHOP_FASTHOP_MASK) | RFLR_PLLHOP_FASTHOP_ON);
-    //     SX1276Write(REG_LR_HOPPERIOD, SX1276.Settings.LoRa.HopPeriod);
-    // }
-
-    // if ((bandwidth == 9) && (SX1276.Settings.Channel > RF_MID_BAND_THRESH))
-    // {
-    //     // ERRATA 2.1 - Sensitivity Optimization with a 500 kHz Bandwidth
-    //     SX1276Write(REG_LR_HIGHBWOPTIMIZE1, 0x02);
-    //     SX1276Write(REG_LR_HIGHBWOPTIMIZE2, 0x64);
-    // }
-    // else if (bandwidth == 9)
-    // {
-    //     // ERRATA 2.1 - Sensitivity Optimization with a 500 kHz Bandwidth
-    //     SX1276Write(REG_LR_HIGHBWOPTIMIZE1, 0x02);
-    //     SX1276Write(REG_LR_HIGHBWOPTIMIZE2, 0x7F);
-    // }
-    // else
-    // {
-    //     // ERRATA 2.1 - Sensitivity Optimization with a 500 kHz Bandwidth
-    //     SX1276Write(REG_LR_HIGHBWOPTIMIZE1, 0x03);
-    // }
-
-    // if (config->data_rate == SF_6)
-    // {
-    //     fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF6);
-    //     fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF6);
-    // }
-    // else
-    // {
-    //     fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF7_TO_SF12);
-    //     fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF7_TO_SF12);
-    // }
 }
 
 int sx127x_get_opmode(const spi_t *spi, uint8_t *mode)
