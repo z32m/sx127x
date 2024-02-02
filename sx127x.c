@@ -138,6 +138,11 @@ int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config)
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_MASK, RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_OFF);
 
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK, RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB);
+
+
+    fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG3, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON);
+
+
     fallback(1, sx127x_write_reg, spi, REG_LR_SYMBTIMEOUTLSB, RFLR_SYMBTIMEOUTLSB_SYMBTIMEOUT);
 
     fallback(1, sx127x_write_reg, spi, REG_LR_PREAMBLEMSB, (uint8_t)((config->preamble_len >> 8) & 0xFF));
@@ -147,16 +152,16 @@ int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config)
     // fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG3, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON);
     fallback(1, sx127x_write_reg, spi, REG_LR_PAYLOADLENGTH, config->packet_len);
 
-    if (config->data_rate == SF_6)
-    {
-        fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF6);
-        fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF6);
-    }
-    else
-    {
-        fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF7_TO_SF12);
-        fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF7_TO_SF12);
-    }
+    // if (config->data_rate == SF_6)
+    // {
+    //     fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF6);
+    //     fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF6);
+    // }
+    // else
+    // {
+    //     fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF7_TO_SF12);
+    //     fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF7_TO_SF12);
+    // }
 }
 
 int sx127x_get_opmode(const spi_t *spi, uint8_t *mode)
