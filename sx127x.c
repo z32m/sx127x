@@ -136,10 +136,10 @@ int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config)
 
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_SF_MASK, config->data_rate);
 
-    uint32_t bitRate = (uint32_t)(SX1276_XTAL_FREQ / (config->data_rate >> 4));
-    // LOG_DBG("set data_rate = %u(SF)", config->data_rate >> 4);
-    fallback(1, sx127x_write_reg, spi, REG_BITRATEMSB, (uint8_t)(bitRate >> 8));
-    fallback(1, sx127x_write_reg, spi, REG_BITRATELSB, (uint8_t)(bitRate & 0xFF));
+    // uint32_t bitRate = (uint32_t)(SX1276_XTAL_FREQ / (config->data_rate >> 4));
+    // // LOG_DBG("set data_rate = %u(SF)", config->data_rate >> 4);
+    // fallback(1, sx127x_write_reg, spi, REG_BITRATEMSB, (uint8_t)(bitRate >> 8));
+    // fallback(1, sx127x_write_reg, spi, REG_BITRATELSB, (uint8_t)(bitRate & 0xFF));
 
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_RXPAYLOADCRC_MASK, RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON);
 
@@ -152,6 +152,17 @@ int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config)
 
     // fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG3, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON);
     fallback(1, sx127x_write_reg, spi, REG_LR_PAYLOADLENGTH, config->packet_len);
+
+    if (config->data_rate = SF_6)
+    {
+        fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF6);
+        fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF6);
+    }
+    else
+    {
+        fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF7_TO_SF12);
+        fallback(1, sx127x_write_reg, spi, REG_LR_DETECTIONTHRESHOLD, RFLR_DETECTIONTHRESH_SF7_TO_SF12);
+    }
 }
 
 int sx127x_get_opmode(const spi_t *spi, uint8_t *mode)
