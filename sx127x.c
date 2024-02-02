@@ -135,6 +135,12 @@ int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config)
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG1, RFLR_MODEMCONFIG1_IMPLICITHEADER_MASK, config->implicit_header);
 
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_SF_MASK, config->data_rate);
+
+    uint32_t bitRate = (uint32_t)(SX1276_XTAL_FREQ / (config->data_rate >> 4));
+    // LOG_DBG("set data_rate = %u(SF)", config->data_rate >> 4);
+    fallback(1, sx127x_write_reg, spi, REG_BITRATEMSB, (uint8_t)(bitRate >> 8));
+    fallback(1, sx127x_write_reg, spi, REG_BITRATELSB, (uint8_t)(bitRate & 0xFF));
+
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_RXPAYLOADCRC_MASK, RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON);
 
     fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG2, RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK, RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB);
