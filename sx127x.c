@@ -151,7 +151,9 @@ int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config)
 
     // fallback(1, sx127x_update_reg, spi, REG_LR_MODEMCONFIG3, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK, RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON);
     fallback(1, sx127x_write_reg, spi, REG_LR_PAYLOADLENGTH, config->packet_len);
-
+    // ? RegMaxPayloadLength
+    // ? RegSyncWord
+    
     // if (config->data_rate == SF_6)
     // {
     //     fallback(1, sx127x_update_reg, spi, REG_LR_DETECTOPTIMIZE, RFLR_DETECTIONOPTIMIZE_MASK, RFLR_DETECTIONOPTIMIZE_SF6);
