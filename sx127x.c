@@ -31,6 +31,30 @@ BITS_GROUP(opmode_state, 0, 2,
 
 BITS_VALUE(sx127x_reg_opmode, opmode_mode, opmode_modulation_type, opmode_freq, opmode_state);
 
+#define BITS_BIT(_g, _n, _b) \
+    BITS_SINGLE(_g##_n, _b, DESC(1, #_n), DESC(0, "."))
+
+BITS_BIT(irqflags, timeout, 7);
+BITS_BIT(irqflags, rxdone, 6);
+BITS_BIT(irqflags, payloadcrcerror, 5);
+BITS_BIT(irqflags, validheader, 4);
+BITS_BIT(irqflags, txdone, 3);
+BITS_BIT(irqflags, caddone, 2);
+BITS_BIT(irqflags, tifhsschangedchannelmeout, 1);
+BITS_BIT(irqflags, caddetected, 0);
+
+/*
+
+#define RFLR_IRQFLAGS_RXTIMEOUT_MASK                0x80
+#define RFLR_IRQFLAGS_RXDONE_MASK                   0x40
+#define RFLR_IRQFLAGS_PAYLOADCRCERROR_MASK          0x20
+#define RFLR_IRQFLAGS_VALIDHEADER_MASK              0x10
+#define RFLR_IRQFLAGS_TXDONE_MASK                   0x08
+#define RFLR_IRQFLAGS_CADDONE_MASK                  0x04
+#define RFLR_IRQFLAGS_FHSSCHANGEDCHANNEL_MASK       0x02
+#define RFLR_IRQFLAGS_CADDETECTED_MASK              0x01
+
+*/
 int sx127x_read_reg(const spi_t *spi, uint8_t reg, uint8_t *val)
 {
     return spi_write_read(spi, &reg, 1, val, 1);
