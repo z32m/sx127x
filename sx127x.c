@@ -106,8 +106,18 @@ int sx127x_set_freq(const sx127x_dt_spec_t *sx127x, uint32_t freq)
     return 0;
 }
 
-int sx127x_set_opmode(const sx127x_dt_spec_t *sx127x, uint8_t mode)
+int sx127x_set_opmode(const sx127x_dt_spec_t *sx127x, sx127x_opmode_t mode)
 {
+    // mapping DIO0 to TX -> TX_DONE or RX_DONE interrupt mode
+    if (mode == SX_TX)
+    {
+        SURE(sx127x_write_reg, sx127x, REG_LR_DIOMAPPING1, 1 << 6);
+    }
+    else
+    {
+        SURE(sx127x_write_reg, sx127x, REG_LR_DIOMAPPING1, 0 << 6);
+    }
+
     return sx127x_update_reg(sx127x, REG_OPMODE, RF_OPMODE_MASK, mode);
 }
 
@@ -266,6 +276,6 @@ int sx127x_transmit(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length
         i++;
     }
 
-    fallback(1, sx127x_set_opmode, sx127x, RF_OPMODE_TRANSMITTER);
+    fallback(1, sx127x_set_opmode, sx127x, SX_TX);
     return 0;
 }

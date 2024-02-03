@@ -85,6 +85,16 @@ typedef enum
     iqf_cad_detected = 1 << 0,
 } sx127x_irq_flags_t;
 
+typedef enum
+{
+    SX_SLEEP = RF_OPMODE_SLEEP,
+    SX_STANDBY = RF_OPMODE_STANDBY,
+    SX_STX = RF_OPMODE_SYNTHESIZER_TX,
+    SX_TX = RF_OPMODE_TRANSMITTER,
+    SX_SRX = RF_OPMODE_SYNTHESIZER_RX,
+    SX_RX = RF_OPMODE_RECEIVER,
+} sx127x_opmode_t;
+
 typedef void (*sx127x_callback_t)(const sx127x_dt_spec_t *config, sx127x_irq_flags_t falgs);
 
 typedef struct
