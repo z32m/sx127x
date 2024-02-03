@@ -251,3 +251,20 @@ int sx127x_receive(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t leng
 
     return 0;
 }
+
+int sx127x_transmit(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length)
+{
+    uint8_t tx_base;
+    fallback(1, sx127x_read_reg, sx127x, REG_LR_FIFOTXBASEADDR, &tx_base);
+
+    int i = 0;
+    while (i < length)
+    {
+        fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFOADDRPTR, tx_base + i);
+        fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFO, buffer + i);
+        i++;
+    }
+
+    fallback(1, sx127x_set_opmode, sx127x, RF_OPMODE_TRANSMITTER);
+    return 0;
+}

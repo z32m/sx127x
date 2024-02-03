@@ -95,7 +95,7 @@ typedef struct
     sx127x_callback_t callback;
 } sx127x_config_t;
 
-#define DIFINE_SX127X(_l)                                                            \
+#define DEFINE_SX127X(_l)                                                            \
     const sx127x_dt_spec_t _l = {.spi = SPI_DT_SPEC_GET(L(_l), SPI_WORD_SET(8), 50), \
                                  .reset = GPIO_DT_SPEC_GET(L(_l), reset_gpios),      \
                                  .dio0 = GPIO_DT_SPEC_GET(L(_l), dio_gpios)}
@@ -115,5 +115,6 @@ int sx127x_setup_modem(const sx127x_dt_spec_t *sx12x, sx127x_modem_config_t *mod
 
 int sx127x_get_rx_length(const sx127x_dt_spec_t *sx127x, uint8_t *length);
 int sx127x_receive(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length);
+int sx127x_transmit(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length);
 
 #endif
