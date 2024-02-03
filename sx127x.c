@@ -250,9 +250,10 @@ int inline sx127x_get_rx_length(const sx127x_dt_spec_t *sx127x, uint8_t *length)
 
 int sx127x_receive(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length)
 {
-    uint8_t i;
+    uint8_t i, dummy;
     fallback(1, sx127x_read_reg, sx127x, REG_LR_FIFORXCURRENTADDR, &i);
     fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFOADDRPTR, i);
+
     i = 0;
     while (i < length)
     {
@@ -265,14 +266,22 @@ int sx127x_receive(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length)
 
 int sx127x_transmit(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length)
 {
-    uint8_t tx_base;
+    uint8_t tx_base, payload_length, dummy = 0;
     fallback(1, sx127x_read_reg, sx127x, REG_LR_FIFOTXBASEADDR, &tx_base);
+    fallback(1, sx127x_read_reg, sx127x, REG_LR_PAYLOADLENGTH, &payload_length);
 
     int i = 0;
     while (i < length)
     {
         fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFOADDRPTR, tx_base + i);
         fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFO, *((uint8_t *)buffer + i));
+        i++;
+    }
+
+    while (i < payload_length)
+    {
+        fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFOADDRPTR, tx_base + i);
+        fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFO, &dummy);
         i++;
     }
 
