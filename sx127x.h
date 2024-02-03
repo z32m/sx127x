@@ -6,7 +6,12 @@
 #include <sx1276Regs-Fsk.h>
 #include <sx1276Regs-LoRa.h>
 #include <bits.h>
+#include <xglob.h>
+#include <xgpio.h>
 
+//  SF7 to SF9 at 125kHz,
+//  SF7 to SF10 at 250kHz,
+//  SF7 to SF11 at 500kHz
 typedef enum
 {
     SF_6 = RFLR_MODEMCONFIG2_SF_6,
@@ -56,19 +61,59 @@ typedef struct
     implicit_header_t implicit_header;
     uint16_t preamble_len;
     uint8_t packet_len;
-} sx127x_config_t;
+} sx127x_modem_config_t;
 
 DEFINE_BITS(sx127x_reg_opmode);
 DEFINE_BITS(sx127x_reg_irqflags);
 
-int sx127x_read_reg(const spi_t *spi, uint8_t reg, uint8_t *val);
-int sx127x_write_reg(const spi_t *spi, uint8_t reg, uint8_t val);
-int sx127x_set_freq(const spi_t *spi, uint32_t freq);
+typedef struct
+{
+    spi_dt_spec_t spi;
+    gpio_dt_spec_t reset;
+    gpio_dt_spec_t dio0;
+} sx127x_dt_spec_t;
 
-int sx127x_get_opmode(const spi_t *spi, uint8_t *mode);
-int sx127x_update_opmode(const spi_t *spi, uint8_t mode);
-int sx127x_update_modem_mode(const spi_t *spi, uint8_t mode);
+typedef enum
+{
+    iqf_timeout = 1 << 7,
+    iqf_rx_done = 1 << 6,
+    iqf_payload_crc_error = 1 << 5,
+    iqf_valid_header = 1 << 4,
+    iqf_tx_done = 1 << 3,
+    iqf_cad_done = 1 << 2,
+    iqf_tifhss_changed_channelmeout = 1 << 1,
+    iqf_cad_detected = 1 << 0,
+} sx127x_irq_flags_t;
 
-int sx127x_configure_lora(const spi_t *spi, sx127x_config_t *config);
+typedef void (*sx127x_callback_t)(const sx127x_dt_spec_t *config, sx127x_irq_flags_t falgs);
+
+typedef struct
+{
+    // all initlized by sx127x
+    const sx127x_dt_spec_t *spec;
+    gpio_user_callback_t dio0_callback;
+    sx127x_callback_t callback;
+} sx127x_config_t;
+
+#define DIFINE_SX127X(_l)                                                            \
+    const sx127x_dt_spec_t _l = {.spi = SPI_DT_SPEC_GET(L(_l), SPI_WORD_SET(8), 50), \
+                                 .reset = GPIO_DT_SPEC_GET(L(_l), reset_gpios),      \
+                                 .dio0 = GPIO_DT_SPEC_GET(L(_l), dio_gpios)}
+
+#define SX127X_RESET_TIME_MS 10
+
+int sx127x_read_reg(const sx127x_dt_spec_t *sx127x, uint8_t reg, uint8_t *val);
+int sx127x_write_reg(const sx127x_dt_spec_t *sx127x, uint8_t reg, uint8_t val);
+int sx127x_set_freq(const sx127x_dt_spec_t *sx127x, uint32_t freq);
+
+int sx127x_get_opmode(const sx127x_dt_spec_t *sx127x, uint8_t *mode);
+int sx127x_set_opmode(const sx127x_dt_spec_t *sx127x, uint8_t mode);
+int sx127x_update_modem_mode(const sx127x_dt_spec_t *sx127x, uint8_t mode);
+
+int sx127x_configure(const sx127x_dt_spec_t *spec, sx127x_config_t *config, sx127x_callback_t callback);
+int sx127x_setup_modem(const sx127x_dt_spec_t *sx12x, sx127x_modem_config_t *modem_config);
+
+int sx127x_get_rx_length(const sx127x_dt_spec_t *sx127x, uint8_t *length);
+int sx127x_receive(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length);
 
 #endif

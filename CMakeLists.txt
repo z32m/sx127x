@@ -12,6 +12,7 @@ target_link_libraries(${lib} PUBLIC zephyr_interface)
 target_link_libraries(${lib} PUBLIC xspi)
 target_link_libraries(${lib} PUBLIC xlog)
 target_link_libraries(${lib} PUBLIC xglob)
+target_link_libraries(${lib} PUBLIC xgpio)
 target_link_libraries(${lib} PUBLIC bits)
 
 set(lora_sdk $ENV{ZEPHYR_BASE}../modules/lib/loramac-node/src/radio/sx1276)
