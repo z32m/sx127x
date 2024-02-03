@@ -129,6 +129,7 @@ int sx127x_reset(const sx127x_dt_spec_t *config)
     fallback(1, gpio_pin_set_dt, reset, 1);
     k_msleep(SX127X_RESET_TIME_MS);
     fallback(1, gpio_pin_set_dt, reset, 0);
+    k_msleep(2 * SX127X_RESET_TIME_MS);
 
     return 0;
 }
@@ -237,7 +238,7 @@ int inline sx127x_get_rx_length(const sx127x_dt_spec_t *sx127x, uint8_t *length)
     return sx127x_read_reg(sx127x, REG_LR_RXNBBYTES, length);
 }
 
-int sx127x_receive(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length)
+int sx127x_receive(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length)
 {
     uint8_t i;
     fallback(1, sx127x_read_reg, sx127x, REG_LR_FIFORXCURRENTADDR, &i);
@@ -245,14 +246,14 @@ int sx127x_receive(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t leng
     i = 0;
     while (i < length)
     {
-        fallback(1, sx127x_read_reg, sx127x, REG_LR_FIFO, buffer + i);
+        fallback(1, sx127x_read_reg, sx127x, REG_LR_FIFO, (uint8_t *)buffer + i);
         i++;
     }
 
     return 0;
 }
 
-int sx127x_transmit(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length)
+int sx127x_transmit(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length)
 {
     uint8_t tx_base;
     fallback(1, sx127x_read_reg, sx127x, REG_LR_FIFOTXBASEADDR, &tx_base);
@@ -261,7 +262,7 @@ int sx127x_transmit(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t len
     while (i < length)
     {
         fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFOADDRPTR, tx_base + i);
-        fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFO, buffer + i);
+        fallback(1, sx127x_write_reg, sx127x, REG_LR_FIFO, *((uint8_t *)buffer + i));
         i++;
     }
 

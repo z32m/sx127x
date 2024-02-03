@@ -100,7 +100,7 @@ typedef struct
                                  .reset = GPIO_DT_SPEC_GET(L(_l), reset_gpios),      \
                                  .dio0 = GPIO_DT_SPEC_GET(L(_l), dio_gpios)}
 
-#define SX127X_RESET_TIME_MS 10
+#define SX127X_RESET_TIME_MS 20
 
 int sx127x_read_reg(const sx127x_dt_spec_t *sx127x, uint8_t reg, uint8_t *val);
 int sx127x_write_reg(const sx127x_dt_spec_t *sx127x, uint8_t reg, uint8_t val);
@@ -114,7 +114,7 @@ int sx127x_configure(const sx127x_dt_spec_t *spec, sx127x_config_t *config, sx12
 int sx127x_setup_modem(const sx127x_dt_spec_t *sx12x, sx127x_modem_config_t *modem_config);
 
 int sx127x_get_rx_length(const sx127x_dt_spec_t *sx127x, uint8_t *length);
-int sx127x_receive(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length);
-int sx127x_transmit(const sx127x_dt_spec_t *sx127x, uint8_t *buffer, uint8_t length);
+int sx127x_receive(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length);
+int sx127x_transmit(const sx127x_dt_spec_t *sx127x, void *buffer, uint8_t length);
 
 #endif
